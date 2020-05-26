@@ -11,6 +11,7 @@
 
 #pragma once
 #include <stdexcept>
+#include <stdexcept>
 using namespace DirectX;
 
 // Note that while ComPtr is used to manage the lifetime of resources on the CPU,
@@ -71,6 +72,7 @@ private:
         USE_SLM_8X8_4X16,
         USE_BYTEADDRESS_BUFFER,
         USE_SIMD_16x2_4x32,
+        USE_SIMD_16x1_16x1_2dims,
         UNSUPPORTED
     };
 

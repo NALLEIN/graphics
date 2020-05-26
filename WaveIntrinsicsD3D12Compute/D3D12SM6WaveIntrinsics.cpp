@@ -18,6 +18,7 @@
 #include "SIMD_16x1_1x16_cs.hlsl.h"
 #include "SIMD_16x2_4x32_cs.hlsl.h"
 #include "BYTEADDRESS_BUFFER_cs.hlsl.h"
+#include "SIMD_16x1_16x1_2dims_cs.hlsl.h"
 #include <chrono>
 #include <iostream>
 
@@ -78,7 +79,7 @@ D3D12SM6WaveIntrinsics::D3D12SM6WaveIntrinsics(int argc, char *argv[]) :
         if (cmd == "-h" || cmd == "--help")
         {
             std::cout << "-h, --help     Show this help text and exit." << std::endl;
-            std::cout << "-k, --kernel SIMD_8X4_1X8 | SIMD_16x2_1x8 | SIMD_16x1_1x16 | SIMD_16x1_1x16_ByteAddressBuffer | SIMD_4x1_1x8 | SLM_8X8_4X16 | SIMD_16x2_4x32" << std::endl;
+            std::cout << "-k, --kernel SIMD_8X4_1X8 | SIMD_16x2_1x8 | SIMD_16x1_1x16 | SIMD_16x1_1x16_ByteAddressBuffer | SIMD_4x1_1x8 | SLM_8X8_4X16 | SIMD_16x2_4x32 |  | SIMD_16x1_16x1_2dims" << std::endl;
             std::cout << "    Determines which algorithm you use for matrix multiplication. By default, SIMD_8X4_1X8 will be run." << std::endl;
             std::cout << "--num-dispatch int_value     Determines how many dispatch commands will be executed per command list." << std::endl;
             std::cout << "--num-frame int_value        Determines how many command lists will be executed." << std::endl;
@@ -144,6 +145,10 @@ D3D12SM6WaveIntrinsics::KERNELTYPE D3D12SM6WaveIntrinsics::GetKernalVersion(cons
     {
         return KERNELTYPE::USE_SIMD_16x2_4x32;
     } 
+    else if (kernal == "SIMD_16x1_16x1_2dims")
+    {
+        return KERNELTYPE::USE_SIMD_16x1_16x1_2dims;
+    } 
     else if (kernal == "SIMD_16x1_1x16_ByteAddressBuffer")
     {
         return KERNELTYPE::USE_BYTEADDRESS_BUFFER;
@@ -198,6 +203,12 @@ void D3D12SM6WaveIntrinsics::Start()
             m_tileK = 64;
             m_tileN = 128;
             m_componentSize = 4;
+            break;
+        case D3D12SM6WaveIntrinsics::USE_SIMD_16x1_16x1_2dims:
+            m_tileM = 16;
+            m_tileK = 16;
+            m_tileN = 16;
+            m_componentSize = 1;
             break;
         case D3D12SM6WaveIntrinsics::NONE:
             return;
@@ -393,6 +404,9 @@ void D3D12SM6WaveIntrinsics::LoadAssets()
             break;
         case D3D12SM6WaveIntrinsics::USE_SIMD_16x2_4x32:
             descComputePSO.CS = { g_SIMD_16x2_4x32_CS, sizeof(g_SIMD_16x2_4x32_CS) };
+            break;
+        case D3D12SM6WaveIntrinsics::USE_SIMD_16x1_16x1_2dims:
+            descComputePSO.CS = { g_SIMD_16x1_16x1_2dims_CS, sizeof(g_SIMD_16x1_16x1_2dims_CS) };
             break;
         case D3D12SM6WaveIntrinsics::USE_SLM_8X8_4X16:
         {
@@ -788,7 +802,7 @@ void D3D12SM6WaveIntrinsics::RenderScene()
     float acc = 0.0;
     for (unsigned int k = 0; k < m_K; k++)
     {
-        acc += buf1Data[m*m_K + k] * buf2Data[k*m_N + n];
+        acc += buf1Data[m*m_K + k] * buf2Data[n*m_N + k];
     }
     printf("The result is GPU: %f, CPU: %f\n", result, acc);
 #endif // PRINT_DATA
