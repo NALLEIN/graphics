@@ -1321,7 +1321,7 @@ void main(CS_INPUT input)
     // int dst_write0 = local_x + ( group_x * ( TILE_N / VEC_SIZE ) ) + ( group_y * TILE_M ) * width1;
     // int src0_read = local_x + ( group_y * TILE_M ) * width0;
     // int src1_read0 = local_x + ( group_x * ( TILE_N / VEC_SIZE ) );
-    int src1_read0 = local_x + (  group_x * ( TILE_N / VEC_SIZE )  ) * width1;
+    int src1_read0 = local_x + (  group_x * ( TILE_N / VEC_SIZE )  ) * width0;
     // Walk ACROSS src0 and DOWN src1:
     int w = 0;
     do
@@ -1334,12 +1334,11 @@ void main(CS_INPUT input)
         // Now load btile, which is K rows x N columns
         // K = 16, we have 1 row of work-items, so each work-item must load 16/1 = 16 rows
         // N = 16, we have 16 columns of work-items, so each work-item must load 16/16 = 1 columns
-        float brow;
+        float brow = src1[ src1_read0 ];
 
 		for (int i = 0; i < 16; i++)
 		{
         arow = src0[src0_read + i * width0 ];
-        brow = src1[ src1_read0 ];
         dot[i] = mad( (float)(intel_sub_group_shuffle( arow, 0 )), (float)(intel_sub_group_shuffle( brow, 0 )), dot[i] );
         dot[i] = mad( (float)(intel_sub_group_shuffle( arow, 1 )), (float)(intel_sub_group_shuffle( brow, 1 )), dot[i] );
         dot[i] = mad( (float)(intel_sub_group_shuffle( arow, 2 )), (float)(intel_sub_group_shuffle( brow, 2 )), dot[i] );

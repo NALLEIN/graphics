@@ -802,7 +802,7 @@ void D3D12SM6WaveIntrinsics::RenderScene()
     float acc = 0.0;
     for (unsigned int k = 0; k < m_K; k++)
     {
-        acc += buf1Data[m*m_K + k] * buf2Data[n*m_N + k];
+        acc += buf1Data[m*m_K + k] * buf2Data[n*m_K + k];
     }
     printf("The result is GPU: %f, CPU: %f\n", result, acc);
 #endif // PRINT_DATA
