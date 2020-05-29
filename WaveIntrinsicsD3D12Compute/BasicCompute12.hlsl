@@ -1308,9 +1308,9 @@ void main(CS_INPUT input)
     // N = 16, we have 16 columns of work-items, so we need 16/16 = 1 result across
 
     float  dot[4][4];
-    for (int i = 0; i < WPT_Row; i++)
+    for (int i = 0; i < WPT_Col; i++)
     {
-        for(int j = 0; j< WPT_Col; j++) {
+        for(int j = 0; j< WPT_Row; j++) {
             dot[i][j] = 0;
         }
     }
@@ -1340,10 +1340,10 @@ void main(CS_INPUT input)
         // N = 16, we have 16 columns of work-items, so each work-item must load 16/16 = 1 columns
         float brow;
 
-		for (int i = 0; i < WPT_Row; i++)
+		for (int i = 0; i < WPT_Col; i++)
 		{
             arow = src0[src0_read + i * width0 ];
-            for(int j = 0; j < WPT_Col; j++) {
+            for(int j = 0; j < WPT_Row; j++) {
                 brow = src1[src1_read0 + j * width0 ];
                 dot[i][j] = mad( (float)(intel_sub_group_shuffle( arow, 0 )), (float)(intel_sub_group_shuffle( brow, 0 )), dot[i][j] );
                 dot[i][j] = mad( (float)(intel_sub_group_shuffle( arow, 1 )), (float)(intel_sub_group_shuffle( brow, 1 )), dot[i][j] );
@@ -1369,8 +1369,8 @@ void main(CS_INPUT input)
     }
     while( w < width0 );
 
-    for(int i = 0; i < WPT_Row; i++) {
-        for(int j = 0; j < WPT_Col; j ++) {
+    for(int i = 0; i < WPT_Col; i++) {
+        for(int j = 0; j < WPT_Row; j ++) {
             dst[dst_write0 + i * width1 + j] = dot[i][j];
         }
     }
