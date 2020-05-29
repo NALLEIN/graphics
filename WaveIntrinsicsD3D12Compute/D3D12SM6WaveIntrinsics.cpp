@@ -205,9 +205,9 @@ void D3D12SM6WaveIntrinsics::Start()
             m_componentSize = 4;
             break;
         case D3D12SM6WaveIntrinsics::USE_SIMD_16x1_16x1_2dims:
-            m_tileM = 16;
+            m_tileM = 64;
             m_tileK = 16;
-            m_tileN = 16;
+            m_tileN = 64;
             m_componentSize = 1;
             break;
         case D3D12SM6WaveIntrinsics::NONE:
